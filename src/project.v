@@ -71,12 +71,17 @@ module elevator_state_machine (
         else
           next_state = IDLE_STATE;
       end
-      MOVING_UP, MOVING_DOWN: begin
+      MOVING_UP: begin
        idle_display  = 0;
         if (current_floor == requested_floor)
           next_state = IDLE_STATE;
-        else if (current_floor < requested_floor)
+        else
           next_state = MOVING_UP;
+      end
+      MOVING_DOWN: begin
+       idle_display  = 0;
+        if (current_floor == requested_floor)
+          next_state = IDLE_STATE;
         else
           next_state = MOVING_DOWN;
       end
@@ -84,7 +89,6 @@ module elevator_state_machine (
         next_state = IDLE_STATE; // Error state, go back to IDLE
     endcase
   end
-    
   
   // Sequential logic 
   always @(posedge clk or posedge reset) begin
