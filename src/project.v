@@ -30,7 +30,7 @@ module tt_um_example (
     .requested_floor(ui_in[3:0]),
     //.requested_floor(4'd2),
     .current_floor(floor),
-    .idle_display (uo_out [7])
+    .idle_display (uo_out[7])
   );
   
   segment7 s7 (
@@ -45,7 +45,7 @@ module elevator_state_machine (
   input reset, // Reset signal 
   input wire [3:0] requested_floor,
   output reg [3:0] current_floor,
-  output reg idle_display 
+  output wire idle_display 
 );
 
   // Define the states
