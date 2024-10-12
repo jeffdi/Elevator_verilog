@@ -23,29 +23,31 @@ module tt_um_example (
   wire [3:0] floor;
  
   // List all unused inputs to prevent warnings
-  wire _unused = &{ena, 1'b0};
+  wire _unused = &{ena, ui_in[7:4], uio_in[7:0], 1'b0};
+    
   elevator_state_machine em (
     .clk(clk),
-    .reset(rst_n),
+    .rst_n(rst_n),
     .requested_floor(ui_in[3:0]),
     //.requested_floor(4'd2),
     .current_floor(floor),
-    .idle_display (uo_out[7])
+    .idle_display(uo_out[7])
   );
   
   segment7 s7 (
     .floor(floor),
     .segment(uo_out[6:0])
   );
+    
 endmodule
 
 
 module elevator_state_machine (
   input clk, // Clock signal
-  input reset, // Reset signal 
+  input rst_n, // Reset signal inverted
   input wire [3:0] requested_floor,
   output reg [3:0] current_floor,
-  output wire idle_display 
+  output reg idle_display 
 );
 
   // Define the states
@@ -92,14 +94,14 @@ module elevator_state_machine (
   
   // Sequential logic 
   always @(posedge clk or posedge reset) begin
-    if (reset) begin
+      if (not rst_n) begin
           current_state <= IDLE_STATE;
           current_floor <= 0;
           delay <= 0;
     end else begin
       current_state <= next_state; //Update the current state
+        
       //Update the current_floor
-      
       if (delay == DELAY_COUNT) begin
         delay <= 0; //Reset delay
         if (current_state == MOVING_UP) 
@@ -107,8 +109,7 @@ module elevator_state_machine (
         else if (current_state == MOVING_DOWN) 
           current_floor <= current_floor - 1;
       end else 
-         delay <= delay + 1;
-      
+         delay <= delay + 1;  //increment delay counter
     end
   end
 endmodule
@@ -119,25 +120,7 @@ endmodule
 module segment7(
   input wire [3:0] floor, // 4 bit input to display digits < 10
   output reg [6:0] segment // 7 bit output for 7-segment display
-);
- 
-  /*
-  always @(*) begin
-    case (floor)
-      0: segment = 7'b1000000; 
-      1: segment = 7'b1111001;
-      2: segment = 7'b0100100;
-      3: segment = 7'b0110000;
-      4: segment = 7'b0011001;
-      5: segment = 7'b0010010;
-      6: segment = 7'b0000010;
-      7: segment = 7'b1111000;
-      8: segment = 7'b0000000;
-      9: segment = 7'b0010000;
-      default: segment = 7'b1111111;
-    endcase
-  end*/
-  
+); 
   
     always @(*) begin
     case (floor)
